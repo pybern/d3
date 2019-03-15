@@ -103,9 +103,16 @@
        .duration(updateDuration)
        .attr("width", cellSize)
      .transition()
-       .delay(function(d, i) {return ((i - n0) * updateDelay) + 1000;})
+       .delay(function(d, i) {return ((i - n0) * updateDelay) + 2500;})
        .duration(updateDuration)
-       .style("fill", "red")
+       .style("fill", function(i){
+         if (i < n1/2){
+           return "red"
+         }
+         else {
+           return "yellow"
+         }
+       });
 
    annotes
        .text(annoted)
