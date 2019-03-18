@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+ <meta charset="utf-8">
+ <link href='https://fonts.googleapis.com/css?family=Lato:300,900' rel='stylesheet' type='text/css'>
+ <style>
+ .cells {
+   fill: #aaa;
+ }
+ .label {
+   text-anchor: start;
+   font: 24px sans-serif;
+ }
+ #drawing {
+   margin-top: 0px;
+   float: left;
+ }
+ #annotes {
+   margin-top: 30px;
+   font-size: 12;
+   font-family: sans-serif;
+   text-align: justify;
+   word-break:break-all;
+ }
+ </style>
+ <div id="drawing"> <svg width="960" height="990"></svg> </div>
+ <div id="annotes"> The growth of loss ratio in 2017 and 2018 </div>
+ <script src="https://d3js.org/d3.v4.js"></script>
+ <script>
+ var data = [
+   {"event" : "Block1",
+    "blocks": 4683,
+    "denom": "t",
+    "domain": [3963]},
+
+    {"event" : "Break",
+     "blocks": 0,
+     "denom": "t",
+     "domain": [3963]
+    },
+
+   {"event" : "Block2",
+    "blocks": 3260,
+    "denom": "m",
+    "domain": [3210]},
+
+    {"event" : "Break",
+     "denom": "m",
+     "blocks": 0,
+     "domain": [3210]}
+  ]
+ var formatNumber = d3.format(",d");
+ var colorScale = d3.scaleThreshold().range(["#70C1B3","#FF1654","#B2DBBF","#F3FFBD","#247BA0"])
+ var svg = d3.select("svg");
+ var width = +svg.attr("width"),
+     height = +svg.attr("height");
+ var groupSpacing = 3,
+     cellSpacing = 1,
+     cellSize = Math.floor((width - 11 * groupSpacing) / 100) - cellSpacing,
+     offset = Math.floor((width - 100 * cellSize - 90 * cellSpacing - 11 * groupSpacing) / 2);
+ var updateDuration = 125,
+     updateDelay = updateDuration / 500;
+ var cell = svg.append("g")
+     .attr("class", "cells")
+     .attr("transform", "translate(" + offset + "," + (offset + 30) + ")");
+
+ var label = svg.append("text")
+     .attr("class", "label");
+ var annotes = d3.select("#annotes")
+   .style("opacity", 1)
+
+ function square(d) {
+   var n1 = d.blocks
+   var annoted = d.event
+   var cScale = colorScale.domain(d.domain)
+
+   var n0 = cell.selectAll("rect").size();
+
+   var cellUpdate = cell.selectAll("rect")
+       .data(d3.range(n1));
+
+   var cellExit = cellUpdate.exit().transition()
+       .delay(function(d, i) { return (n0 - i) * updateDelay})
+       .duration(updateDuration)
+       .attr("width", 0)
+       .remove();
+
+   var cellUpdate = cellUpdate.enter().append("rect")
+       .attr("width", 0)
+       .attr("height", cellSize)
+       .attr("x", function(i) {
+         var x0 = Math.floor(i / 100) % 10, x1 = Math.floor(i % 10);
+         return groupSpacing * x0 + (cellSpacing + cellSize) * (x1 + x0 * 10);
+       })
+       .attr("y", function(i) {
+         var y0 = Math.floor(i / 1000), y1 = Math.floor(i % 100 / 10);
+         return groupSpacing * y0 + (cellSpacing + cellSize) * (y1 + y0 * 10);
+       })
+       .style("fill", function(i){
+         return "lightgrey"
+       })
+       .style("opacity", 0.8)
+     .transition()
+       .delay(function(d, i) {return (i - n0) * updateDelay;})
+       .duration(updateDuration)
+       .attr("width", cellSize)
+     .transition()
+       .delay(function(d, i) {return ((i - n0) * updateDelay) + 2500;})
+       .duration(updateDuration)
+       .style("fill", function(i){
+         return cScale(i)
+       });
+
+   annotes
+       .text(annoted)
+       .transition().style("opacity", 1)
+       .delay(function(d, i) { return (i - n0) * updateDelay; })
+       .duration(Math.abs(n1 - n0) * updateDelay + updateDuration / 2)
+
+   label
+       .attr("x", offset + groupSpacing)
+       .attr("y", offset + groupSpacing)
+       .attr("dy", ".71em")
+     .transition()
+       .duration(Math.abs(n1 - n0) * updateDelay + updateDuration / 2)
+       .ease(d3.easeLinear)
+       .tween("text", function() {
+         if (d.denom === "t") {
+          n0 = n0;
+          n1 = n1;
+         }
+         else if (d.denom === "m") {
+          n0 = n0 * 1000;
+          n1 = n1 * 1000;
+         };
+
+         var self = this;
+         var i = d3.interpolateNumber(n0, n1);
+
+         return function(t) {
+           self.textContent = formatNumber(Math.round(i(t)));
+         };
+       });
+ }
+ curr = 0
+ svg.on("click" ,function interval() {
+   square(data[curr]);
+   if (curr === data.length - 1) {
+     return curr = 0
+   }
+   else {
+     return curr = curr+1
+   }
+ });
+ d3.select(self.frameElement).style("height", height + "px");
+ </script>
