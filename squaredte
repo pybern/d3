@@ -126,14 +126,14 @@
     "denom": "t",
     "first": 2000,
     "second": 800,
-    "domain": [2000]},
+    "domain": [800]},
 
     {"event" : "Break",
      "blocks": 0,
      "denom": "t",
      "first":0,
      "second":0,
-     "domain": [2000]
+     "domain": [800]
     },
 
    {"event" : "asdfasdf",
@@ -141,14 +141,14 @@
     "denom": "m",
     "first": 1000,
     "second": 200,
-    "domain": [1000]},
+    "domain": [200]},
 
     {"event" : "Break",
      "denom": "m",
      "blocks": 0,
      "first": 0,
      "second": 0,
-     "domain": [1000]}
+     "domain": [200]}
   ]
  var formatNumber = d3.format(",d");
  var colorScale = d3.scaleThreshold().range(["#70C1B3","#FF1654","#B2DBBF","#F3FFBD","#247BA0"])
