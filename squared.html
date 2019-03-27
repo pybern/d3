@@ -103,7 +103,7 @@
   </div>
 
   <div id="header">
-   <h1>bla bla:</h1><h2>An animated explantory tool</h2>
+   <h1>header1: </h1><h2>header2</h2>
  </div>
 
  <div id="annotes">
@@ -120,6 +120,7 @@
 </div>
  <script src="https://d3js.org/d3.v4.js"></script>
  <script>
+
  var data = [
    {"event" : "asdfadsf",
     "blocks": 2000,
@@ -149,7 +150,9 @@
      "first": 0,
      "second": 0,
      "domain": [200]}
-  ]
+  ];
+
+
  var formatNumber = d3.format(",d");
  var colorScale = d3.scaleThreshold().range(["#70C1B3","#FF1654","#B2DBBF","#F3FFBD","#247BA0"])
  var svg = d3.select("svg");
@@ -161,9 +164,6 @@
      offset = Math.floor((width - 100 * cellSize - 90 * cellSpacing - 11 * groupSpacing) / 2);
  var updateDuration = 125,
      updateDelay = updateDuration / 500;
- var cell = svg.append("g")
-     .attr("class", "cells")
-     .attr("transform", "translate(" + offset + "," + (offset + 30) + ")");
 
  var label = svg.append("text")
      .attr("class", "label");
@@ -175,6 +175,10 @@
    .style("opacity", 1)
 
  function square(d) {
+   var cell = svg.append("g")
+     .attr("class", "cells")
+     .attr("transform", "translate(" + offset + "," + (offset + 30) + ")");
+
    var n1 = d.blocks
    var annoted = d.event
    var cScale = colorScale.domain(d.domain)
@@ -182,14 +186,6 @@
 
    cells = cell.selectAll("rect")
        .data(d3.range(n1));
-
-  console.log(n0,n1,cells);
-
-   cells.exit().transition()
-       .delay(function(d, i) { return (n0 - i) * updateDelay})
-       .duration(updateDuration)
-       .attr("width", 0)
-       .remove();
 
    cells.enter().append("rect")
        .attr("width", 0)
@@ -207,11 +203,11 @@
        })
        .style("opacity", 0.8)
      .transition()
-       .delay(function(d, i) {return (i - n0) * updateDelay;})
+       .delay(function(d, i) {return (i - n0) * updateDelay + 1000;})
        .duration(updateDuration)
        .attr("width", cellSize)
      .transition()
-       .delay(function(d, i) {return ((i - n0) * updateDelay) + 2500;})
+       .delay(function(d, i) {return ((i - n0) * updateDelay) + 2000;})
        .duration(updateDuration)
        .style("fill", function(i){
          return cScale(i)
@@ -295,14 +291,23 @@
              self.textContent = "2017 :" + formatNumber(Math.round(i(t)));
            };
          });
- }
+ }  
 
- d3.selectAll(".button1").on("click", function(){
+function remove(){
+  d3.selectAll("rect").transition().remove();
+};
+
+
+ d3.selectAll(".button1").on("click", function animate(){
+
 					option = +this.value;
+          remove();
           square(data[option]);
+          console.log('b');
 				});
 
 
  d3.select(self.frameElement).style("height", height + "px");
  </script>
  </body>
+
